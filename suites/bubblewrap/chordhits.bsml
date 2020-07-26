@@ -1,0 +1,8 @@
+
+track basic chordhits
+
+#define chordD start
+#    dur: 0.75
+#end
+
+#create chordD 47

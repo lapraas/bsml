@@ -1,0 +1,53 @@
+
+# create a track named "piano" using the `basic` blueprint
+track basic piano
+
+# create a set of parameters for the track "piano" called "pianoriser"
+define piano:pianoriser start
+    # the duration of the structure
+    dur: 2
+    # at each step in the given duration,
+    step: 0.1
+    # create a wall with the given length
+    length: -2
+
+    # multiple parameters means easing over the course of the duration
+    # left coordinate of the wall
+    l: -5, -4, linear
+    # right coordinate of the wall
+    r: -5, -3, linear
+    # upper coordinate of the wall
+    u: 0, 2, inSine
+    # lower coordinate of the wall
+    d: 0, 0, linear
+    
+    mirror: true
+end
+
+# create another parameter set for the track "piano" (not specified because it's remembered) called "pianohit"
+define pianohit start
+    dur: 1
+    step: 1
+    length: -1
+    
+    l: -4
+    r: -3
+    u: 2
+    d: 0
+    
+    mirror: true
+end
+
+# combine a series of paramter sets into a single superstructure in the "piano" track called "pianosuper"
+merge piano:pianosuper start
+    # number is the offset from the creation beat
+    piano:pianoriser at 0
+    # meaning this structure starts 2 beats after the creation beat
+    piano:pianohit at 2
+end
+
+# create the piano:piano superstructure at beat 8
+create piano:pianosuper 8
+
+# create the piano:piano superstructure at beat 24
+create piano:pianosuper 24

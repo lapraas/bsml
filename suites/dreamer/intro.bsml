@@ -1,0 +1,106 @@
+
+track basic piano
+
+define piano:chordA# start
+    dur: 6.5
+    
+    l: -6.5
+    r: -6
+    #d: 2
+    d: 0
+    u: 4
+    
+    mirror: 1
+end
+
+define chordC start
+    dur: 1.5
+    
+    #d: 2.5
+    u: 4.5
+end
+
+define chordD start
+    dur: 3
+    
+    #d: 3
+    u: 5
+end
+
+define chordG start
+    dur: 4
+    
+    #d: 1
+    u: 3
+end
+
+define chordA start
+    dur: 1
+    
+    #d: 1.5
+    u: 3.5
+end
+
+merge chordprog1 start
+    chordA# at 0
+    chordC at 6.5
+    chordD at 8
+    chordG at 11
+    chordA at 15
+end
+
+define chordE# start
+    dur: 1.5
+
+    #d: 0.5
+    u: 2.5
+end
+
+define chordG_2 from chordG start
+    dur: 1.5
+end
+
+define chordD# start
+    dur: 4
+    
+    #d: 0
+    u: 2
+end
+
+define chordG_3 from chordG start
+    dur: 1
+end
+
+merge chordprog2 start
+    chordA# at 0
+    chordC at 6.5
+    chordE# at 8
+    chordG_2 at 9.5
+    chordD# at 11
+    chordG_3 at 15
+end
+
+merge chordprog start
+    chordprog1 at 0
+    chordprog2 at 16
+end
+
+create chordprog 16
+create chordprog 48
+
+track basic fall
+
+define fall start
+    dur: 6.5
+    step: 0.125
+    length: -3
+    
+    l: 0, 7, outSine
+    r: 0.4, 7.4, outSine
+    d: 4, 1, outSine
+    u: 4.2, 1.2, outSine
+    
+    mirror: true
+end
+
+create fall 16
