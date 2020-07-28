@@ -61,7 +61,7 @@ merge melodyP1 start
     3: g4
 end
    
-merge melodyP2a start 
+merge melodyP2a start
     0: e#5
     1: d#4
     2: a#4
