@@ -1,4 +1,6 @@
 
+import copy
+
 class Track:
     def __init__(self, blueprint):
         # The blueprint holding the function to create wall Structures.
@@ -22,10 +24,10 @@ class Track:
     
     def create(self, name, beat):
         """ At a given beat, create a new Structure (or new Structures) based on the a given plan (or superplan). """
-        plans = self.plans[name]
-        for plan in plans:
-            # Copy plan.
-            tempPlan = {**plan}
+        planList = self.plans[name]
+        for plan in planList:
+            # Copy plan so that we aren't overwriting keyword evaluations and making them happen multiple times
+            tempPlan = copy.deepcopy(plan)
             # Superplans have plans in them that already have their "beat" attribute defined,
             #   which means we add that value to the beat (treat it like an offset).
             if "beat" in tempPlan:
@@ -40,11 +42,18 @@ class Track:
             #     lrotz: phase (<- reused phase value)
             # end
             for argName in tempPlan:
-                arg = tempPlan[argName]
-                if arg in tempPlan:
-                    tempPlan[argName] = tempPlan[arg]
-                if not isinstance(arg, float):
-                    tempPlan[argName] = float(eval(arg))
+                if argName == "beat": continue
+                argList = tempPlan[argName]
+                for index, arg in enumerate(argList):
+                    #print("arg: %s" % arg)
+                    if arg in tempPlan:
+                        #print("replaced arg %s in tempPlan with %s, which was %s" % (argName, arg, tempPlan[arg]))
+                        tempPlan[argName][index] = tempPlan[arg][index if len(tempPlan[arg]) > 1 else 0]
+                    # Also evaluate non-float arguments as math expressions.
+                    elif not isinstance(arg, float):
+                        tempPlan[argName][index] = float(eval(arg))
+                    
+            # Run the blueprint.
             self.structures.append(self.blueprint.create(**tempPlan))
     
     def merge(self, name, plansWithOffsets):

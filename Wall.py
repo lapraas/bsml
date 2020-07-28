@@ -38,6 +38,9 @@ class Wall:
         return {
             "_time": beat,
             "_duration": self.dur,
+            "_lineIndex": 0,
+            "_type": 0,
+            "_width": 0,
             "_customData": {
                 "_position": [self.l, self.d],
                 "_scale": [self.getWidth(), self.getHeight()],
