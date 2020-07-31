@@ -1,4 +1,6 @@
 
+import math
+
 class Wall:
     def __init__(self, beat, dur, l, r, d, u, rot=0, lrotx=0, lroty=0, lrotz=0):
         self.beat = beat
@@ -17,6 +19,9 @@ class Wall:
         if self.u < self.d:
             raise Exception("Wall with bad dimensions (u: %s, d: %s" % (self.u, self.d))
     
+    def __str__(self):
+        return str(self.__dict__)
+    
     def getWidth(self):
         return self.r - self.l
     
@@ -33,7 +38,8 @@ class Wall:
     
     def json(self):
         """ Get the wall as a json object. """
-        beat = self.beat + 2 # replace with hjd
+        beat = self.beat + 1.4 # replace with hjd
+        w, h = self.getWidth(), self.getHeight()
         
         return {
             "_time": beat,
@@ -42,8 +48,10 @@ class Wall:
             "_type": 0,
             "_width": 0,
             "_customData": {
-                "_position": [self.l, self.d],
-                "_scale": [self.getWidth(), self.getHeight()],
+                # to undo the local rotation z transform we have to take trig parts of it and multiply them by the dimensions of the wall, then add them to the position
+                "_position": [self.l + math.cos(math.radians(self.lrotz - 90)) * h / 2, self.d + math.sin(math.radians(self.lrotz-90)) * h / 2 + h / 2],
+                #"_position": [self.l, self.d],
+                "_scale": [w, h],
                 "_rotation": self.rot,
                 "_localRotation": [self.lrotx, self.lroty, self.lrotz]
             }

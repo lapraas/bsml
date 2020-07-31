@@ -27,7 +27,7 @@ def create(beat, dur, l, r, d, u, rot=[0], lrotx=[0], lroty=[0], lrotz=[0], leng
             
             curBeat += (step[0] + dstep)
     else:
-        newWall = Wall(beat, length[0], l[0], r[0], d[0], u[0])
+        newWall = Wall(beat, length[0], l[0], r[0], d[0], u[0], rot[0], lrotx[0], lroty[0], lrotz[0])
         walls.append(newWall)
     
     structure = Structure(walls)

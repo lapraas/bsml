@@ -51,12 +51,10 @@ class BSMLInterpreter:
                 self.ignoreLines.append(self.ptr)
             # Find a "start" keyword.
             elif line.endswith("start"):
-                self.lines[self.ptr] = line.replace("start", "")
                 addLineToBlock = True
                 self.blocks.append([])
             # Find an "end" keyword.
             elif line.endswith("end"):
-                self.lines[self.ptr] = line.replace("end", "")
                 if not self.lines[self.ptr].strip():
                     self.ignoreLines.append(self.ptr)
                 addLineToBlock = False
@@ -75,9 +73,15 @@ class BSMLInterpreter:
             tokens = [tok.strip() for tok in line.strip().split(" ")]
             # Operator keyword to be matched in the conditional statements below.
             op = tokens[0]
+            if "end" == op:
+                continue
             # Each argument to the operator, supplied to the function called for the operator.
             args = tokens[1:]
-            print("executing %s: %s" % (op, args))
+            hasStart = False
+            if "start" in args:
+                args.remove("start")
+                hasStart = True
+            print("Interpreter: executing %s : %s" % (op, args))
             
             try:
                 # Create a new track, with a specified blueprint and a name.
@@ -85,10 +89,10 @@ class BSMLInterpreter:
                     self.newTrack(blueprint=args[0], name=args[1])
                 # Define a new plan, for a specified track (by name) and based on a preexisting plan if it exists.
                 elif op == "define":
-                    self.define(name=args[0], block=self.blocks.pop(0), fromPlan=None if len(args) <= 2 else args[2])
+                    self.define(name=args[0], block=self.blocks.pop(0) if hasStart else [], fromPlan=None if len(args) <= 2 else args[2])
                 # Create a new structure, based on a specified track's plan.
                 elif op == "create":
-                    self.create(name=args[0], beat=args[1])
+                    self.create(name=args[0], beats=args[1:])
                 # Take a list of tracks' plans and create a super-plan, with a given name.
                 elif op == "merge":
                     self.merge(name=args[0], block=self.blocks.pop(0))
@@ -130,30 +134,20 @@ class BSMLInterpreter:
             # Populate the `vals` list by iterating through a "," separated list.
             for val in line.split(":")[1].split(","):
                 val = val.strip()
-                # Convert `val` into a float if possible.
-                floatable = True
-                for char in val:
-                    if not char in "1234567890.-": floatable = False
-                if floatable: val = float(val)
                 vals.append(val)
             args[key] = vals
-        
-        # Get a fromPlan to base the new plan on from the name, if it exists.
-        if fromPlan != None:
-            fromTrackName, fromPlanName = self.splitNames(fromPlan)
-            # Since getPlan returns a list (to account for super-plans), we want to use only the first plan returned.
-            fromPlan = self.tracks[fromTrackName].getPlan(fromPlanName)[0]
         
         # Call the Track's .define with the parsed arguments.
         self.tracks[self.lastTrack].define(args, self.lastPlan, fromPlan)
     
-    def create(self, name, beat):
+    def create(self, name, beats):
         """ Callback for the "create" keyword.
             Create a new structure based on the plans under the given name at the given beat."""
         self.lastTrack, self.lastPlan = self.splitNames(name)
         
         # Call the Track's .create with the parsed arguments.
-        self.tracks[self.lastTrack].create(self.lastPlan, float(beat))
+        for beat in beats:
+            self.tracks[self.lastTrack].create(self.lastPlan, float(beat))
     
     def merge(self, name, block):
         """ Callback for the "merge" keyword.
@@ -161,13 +155,13 @@ class BSMLInterpreter:
         self.lastTrack, self.lastPlan = self.splitNames(name)
         #print("merge start for %s's %s" % (self.lastTrack, self.lastPlan))
         planOffsets = {}
-        print("Interpreter merge:")
+        #print("Interpreter merge:")
         # Parse the lines containing the plans we want to merge.
         for line in block:
             line = line.strip()
             # The name of the plan will be followed by the beat offset at which it will be placed in relation to the create beat, like "piano:hit at 0"
             splitline = [v.strip() for v in line.split(":")]
-            print("  splitline: %s" % splitline)
+            #print("  splitline: %s" % splitline)
             beat = float(splitline[0])
             #print(splitline)
             mergeTrack, mergePlan = self.splitNames(":".join(splitline[1:]))

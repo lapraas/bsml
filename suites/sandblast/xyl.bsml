@@ -14,44 +14,44 @@ define e5 start
     d: -0.3
     u: 0.3
     
-    phase: 45 + 90 * (13/14)
+    phase: 135 - 90 * (13/14)
     lrotz: phase
 end
 
 define g4 start
-    phase: 45 + 90 * (4/14)
+    phase: 135 - 90 * (4/14)
 end
 
 define c5 start
-    phase: 45 + 90 * (9/14)
+    phase: 135 - 90 * (9/14)
 end
 
 define e#5 start
-    phase: 45 + 90 * (14/14)
+    phase: 135 - 90 * (14/14)
 end
 
 define d#4 start
-    phase: 45 + 90 * (0/14)
+    phase: 135 - 90 * (0/14)
 end
 
 define a#4 start
-    phase: 45 + 90 * (7/14)
+    phase: 135 - 90 * (7/14)
 end
 
 define d#5 start
-    phase: 45 + 90 * (12/14)
+    phase: 135 - 90 * (12/14)
 end
 
 define g#4 start
-    phase: 45 + 90 * (6/14)
+    phase: 135 - 90 * (6/14)
 end
 
 define d5 start
-    phase: 45 + 90 * (11/14)
+    phase: 135 - 90 * (11/14)
 end
 
 define f4 start
-    phase: 45 + 90 * (2/14)
+    phase: 135 - 90 * (2/14)
 end
 
 merge melodyP1 start
@@ -96,5 +96,72 @@ merge melody start
     24: melodyP3
 end
 
-create melody 0
-create melody 32
+create melody 0 32
+
+define e5.back from e5 start
+    dur: 1
+    
+    rx: 6.31
+    ry: 5.31
+    
+    l: -2
+    r: 2
+    d: -0.01
+    u: 0.01
+    
+    lrotz: phase + 90
+end
+
+define g4.back from g4
+define c5.back from c5
+define e#5.back from e#5
+define d#4.back from d#4
+define a#4.back from a#4
+define d#5.back from d#5
+define g#4.back from g#4
+define d5.back from d5
+define f4.back from f4
+
+merge melodyP1.back start
+    0: e5.back
+    1: g4.back
+    2: c5.back
+    3: g4.back
+end
+   
+merge melodyP2a.back start
+    0: e#5.back
+    1: d#4.back
+    2: a#4.back
+    3: g4.back
+end
+
+merge melodyP2b.back start
+    0: d#5.back
+    1: f4.back
+    2: c5.back
+    3: g#4.back
+end
+
+merge melodyP3.back start
+    0: d#5.back
+    1: g#4.back
+    2: c5.back
+    3: a#4.back
+    
+    4: d5.back
+    5: f4.back
+    6: a#4.back
+    7: c5.back
+end
+
+merge melody.back start
+    0: melodyP1.back
+    4: melodyP2a.back
+    8: melodyP3.back
+    16: melodyP1.back
+    20: melodyP2b.back
+    24: melodyP3.back
+end
+
+create melody.back 32

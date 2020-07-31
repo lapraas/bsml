@@ -48,6 +48,7 @@ def create(beat, dur, rx, ry, phase, l, r, d, u, cx=[0], cy=[0], rot=[0], lrotx=
             lroty[0] + dlroty,
             lrotz[0] + dlrotz)
         walls.append(wall)
+        print("circle: Added wall %s" % wall)
         
         cBeat += (step[0] + dstep)
 
