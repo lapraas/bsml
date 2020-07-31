@@ -3,7 +3,7 @@ from Structure import Structure
 from Wall import Wall
 from easings import ez
 
-def create(beat, dur, l, r, d, u, rot=[0], lrotx=[0], lroty=[0], lrotz=[0], length=None, step=None, mirror=False):
+def create(beat, dur, l, r, d, u, rot=[0], lrotx=[0], lroty=[0], lrotz=[0], length=None, step=None, mirror=[0]):
     if length == None: length = [*dur]
     if step == None: step = [*dur]
     walls = []
@@ -31,5 +31,5 @@ def create(beat, dur, l, r, d, u, rot=[0], lrotx=[0], lroty=[0], lrotz=[0], leng
         walls.append(newWall)
     
     structure = Structure(walls)
-    if mirror: structure.mirror()
+    if mirror[0]: structure.mirror()
     return structure

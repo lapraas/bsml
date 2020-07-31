@@ -5,7 +5,7 @@ from easings import ez
 
 import math
 
-def create(beat, dur, rx, ry, phase, l, r, d, u, cx=[0], cy=[0], rot=[0], lrotx=[0], lroty=[0], lrotz=[0], length=None, step=None, mirror=False):
+def create(beat, dur, rx, ry, phase, l, r, d, u, cx=[0], cy=[0], rot=[0], lrotx=[0], lroty=[0], lrotz=[0], length=None, step=None, mirror=[0]):
     if length == None: length = [*dur]
     if step == None: step = [*dur]
     
@@ -48,11 +48,11 @@ def create(beat, dur, rx, ry, phase, l, r, d, u, cx=[0], cy=[0], rot=[0], lrotx=
             lroty[0] + dlroty,
             lrotz[0] + dlrotz)
         walls.append(wall)
-        print("circle: Added wall %s" % wall)
+        #print("circle: Added wall %s" % wall)
         
         cBeat += (step[0] + dstep)
 
     structure = Structure(walls)
-    if int(mirror): structure.mirror()
+    if mirror[0]: structure.mirror()
     return structure
             

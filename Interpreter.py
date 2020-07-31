@@ -49,6 +49,9 @@ class BSMLInterpreter:
             # Find a comment or blank line.
             if line.startswith("#") or not line.strip():
                 self.ignoreLines.append(self.ptr)
+            # Find a comment within a line.
+            elif len(line.split("#")) > 1:
+                self.lines[self.ptr] = line.split("#")[0]
             # Find a "start" keyword.
             elif line.endswith("start"):
                 addLineToBlock = True
@@ -161,15 +164,10 @@ class BSMLInterpreter:
             line = line.strip()
             # The name of the plan will be followed by the beat offset at which it will be placed in relation to the create beat, like "piano:hit at 0"
             splitline = [v.strip() for v in line.split(":")]
-            #print("  splitline: %s" % splitline)
+            print("  splitline: %s" % splitline)
             beat = float(splitline[0])
-            #print(splitline)
-            mergeTrack, mergePlan = self.splitNames(":".join(splitline[1:]))
-            #print("merging track %s's %s" % (mergeTrack, paramSetName))
-            if not self.tracks[mergeTrack].hasPlan(mergePlan):
-                raise BSMLException("Track `%s` has no defined plan `%s`" % (mergeTrack, mergePlan))
             # Set the given plan to the given beat
-            planOffsets[beat] = self.tracks[mergeTrack].getPlan(mergePlan)
+            planOffsets[beat] = splitline[1]
         
         # Call the Track's .merge with the prepared arguments
         self.tracks[self.lastTrack].merge(self.lastPlan, planOffsets)
