@@ -1,7 +1,7 @@
 
 import os
 
-from Interpreter import BSMLInterpreter
+from bsml.Interpreter import BSMLInterpreter
 
 class Suite():
     def __init__(self, folderdir):

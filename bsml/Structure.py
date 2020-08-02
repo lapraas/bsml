@@ -1,7 +1,15 @@
 
 class Structure():
-    def __init__(self, walls):
-        self.walls = walls
+    def __init__(self, walls=None):
+        # i've never seen the fucking compounding kwarg behavior in python and it's fucked me twice tonight
+        # https://docs.python-guide.org/writing/gotchas/#mutable-default-arguments
+        self.walls = walls if walls else []
+        
+    def addWall(self, wall):
+        self.walls.append(wall)
+    
+    def addStructure(self, structure):
+        self.walls += structure.walls
     
     def mirror(self):
         temp = self.walls.copy()

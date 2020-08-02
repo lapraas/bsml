@@ -4,7 +4,8 @@ from blueprints import *
 # Sift out the blueprint names from the random stuff in globals() to create a list with all of them.
 bpnames = [x for x in dir() if not x.startswith("__")]
 
-from Track import Track
+#from Track import Track
+from bsml.Track import Track
 
 class BSMLException(Exception):
     """ Generic exception class to specify an exception while interpreting. """
@@ -101,6 +102,8 @@ class BSMLInterpreter:
                     self.merge(name=args[0], block=self.blocks.pop(0))
                 elif op == "say":
                     print("BSML: ".join(args))
+                elif op == "use":
+                    self.use(name=args[0])
             except Exception as e:
                 print("Exception occurred while running BSML. Line %s: \n%s\n" % (ptr+1, line))
                 raise e
@@ -131,14 +134,15 @@ class BSMLInterpreter:
         for line in block:
             #print("paramsSet line: %s" % line)
             # The value to put into the create arguments as a key.
-            key = line.split(":")[0].strip()
-            # A list of values to be assigned to the key in the arguments.
-            vals = []
-            # Populate the `vals` list by iterating through a "," separated list.
-            for val in line.split(":")[1].split(","):
-                val = val.strip()
-                vals.append(val)
-            args[key] = vals
+            splitLine = line.split(":")
+            key = splitLine[0].strip()
+            ## A list of values to be assigned to the key in the arguments.
+            #vals = []
+            ## Populate the `vals` list by iterating through a "," separated list.
+            #for val in line.split(":")[1].split(","):
+            #    val = val.strip()
+            #    vals.append(val)
+            args[key] = splitLine[1].strip()
         
         # Call the Track's .define with the parsed arguments.
         self.tracks[self.lastTrack].define(args, self.lastPlan, fromPlan)
@@ -148,9 +152,22 @@ class BSMLInterpreter:
             Create a new structure based on the plans under the given name at the given beat."""
         self.lastTrack, self.lastPlan = self.splitNames(name)
         
-        # Call the Track's .create with the parsed arguments.
+        if len(beats) == 0:
+            raise BSMLException("Create keyword was not followed by a beat")
+        
+        # Call the Track's .create with the parsed arguments, multiple times if we have multiple beats
         for beat in beats:
-            self.tracks[self.lastTrack].create(self.lastPlan, float(beat))
+            if ".." in beat:
+                # we want to be able to do a range() of beats, this is the denotation
+                start, end_inc = beat.split("..")
+                end, inc = [round(float(x), 4) for x in end_inc.split(",")]
+                b = round(float(start), 4)
+                while not (b >= end):
+                    self.tracks[self.lastTrack].create(self.lastPlan, b, float(start), end)
+                    b = round(b + inc, 4)
+            else:
+                beat = float(beat)
+                self.tracks[self.lastTrack].create(self.lastPlan, beat)
     
     def merge(self, name, block):
         """ Callback for the "merge" keyword.
@@ -171,6 +188,10 @@ class BSMLInterpreter:
         
         # Call the Track's .merge with the prepared arguments
         self.tracks[self.lastTrack].merge(self.lastPlan, planOffsets)
+    
+    def use(self, name):
+        self.lastTrack, self.lastPlan = self.splitNames(name)
+        self.tracks[self.lastTrack].use(self.lastPlan)
     
     def getStructures(self):
         """ Get a list of all structures in all of the Tracks. """

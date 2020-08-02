@@ -1,9 +1,10 @@
 
 
 import json
-from Suite import Suite
+from bsml.Suite import Suite
+import sys
 
-suite = Suite("suites/sandblast")
+suite = Suite("suites/%s" % sys.argv[1])
 
 import json
 

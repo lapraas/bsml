@@ -1,0 +1,78 @@
+
+track circle buildup
+
+define _static start
+    len: 1
+
+    rad: 15
+    
+    cx: 0
+    cy: 1.5
+    rx: rad * (4 / 3)
+    ry: rad
+    
+    l: -2
+    r: -l
+    d: -1
+    u: -d
+    
+    phaseMod: 0
+    phaseAdd: 45 * t
+    phase: phaseMod + phaseAdd
+    lrotz: phase + 90
+end
+
+use _static
+
+define static.r start
+    phaseMod: 0
+end
+define static.ru start
+    phaseMod: 45
+end
+define static.u start
+    phaseMod: 90
+end
+define static.lu start
+    phaseMod: 135
+end
+define static.l start
+    phaseMod: 180
+end
+define static.ld start
+    phaseMod: 225
+end
+define static.d start
+    phaseMod: 270
+end
+define static.rd start
+    phaseMod: 315
+end
+
+create static 64..80,2
+
+#define _dynamic.1 start
+#    dur: 8
+#    step: 1
+#    length: -1
+#
+#    _rad: 15, 9, x
+#    
+#    cx: 0
+#    cy: 1.5
+#    rx: _rad * (4 / 3)
+#    ry: _rad
+#    
+#    l: -2
+#    r: -l
+#    d: -1
+#    u: -d
+#    
+#    
+#    _phaseAdd: 45, 180, sineOut
+#    phase: _phase + _phaseAdd
+#    lrotz: phase + 90
+#end
+#
+#create static 80
+#
