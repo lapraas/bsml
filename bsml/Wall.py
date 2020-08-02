@@ -44,9 +44,9 @@ class Wall:
         return {
             "_time": beat,
             "_duration": self.dur,
-            "_lineIndex": 0,
-            "_type": h,
-            "_width": w,
+            #"_lineIndex": 0,
+            #"_type": h,
+            #"_width": w,
             "_customData": {
                 # to undo the local rotation z transform we have to take trig parts of it and multiply them by the dimensions of the wall, then add them to the position
                 "_position": [self.l + math.cos(math.radians(self.lrotz - 90)) * h / 2, self.d + math.sin(math.radians(self.lrotz-90)) * h / 2 + h / 2],

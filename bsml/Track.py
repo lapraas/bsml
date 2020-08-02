@@ -58,9 +58,10 @@ class Track:
                 for argName in self.base:
                     arg = self.base[argName]
                     evaldBase[argName] = self.evaluate(arg, cPlan, t)
-            
-                tempStruc.addWall(self.blueprint.create(**{**evaldBase, **cPlan}))
-                if "mirror" in cPlan and cPlan["mirror"]:
+                
+                compound = {**evaldBase, **cPlan}
+                tempStruc.addWall(self.blueprint.create(**compound))
+                if "mirror" in compound and compound["mirror"]:
                     tempStruc.mirror()
                 walls.addStructure(tempStruc)
         
@@ -72,7 +73,7 @@ class Track:
         for word in re.findall(wordPattern, argStr):
             #print(word)
             if word in easings:
-                argStr = argStr.replace(word, str(ez(progress)))
+                argStr = argStr.replace(word, str(ez(word, progress)))
             else:
                 argStr = argStr.replace(word, str(cPlan[word]) if word in cPlan else self.base[word], 1)
         try:

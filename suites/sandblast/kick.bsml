@@ -22,57 +22,77 @@ define _static start
     lrotz: phase + 90
 end
 
-use _static
-
-define static.r start
+define main.r start
     phaseMod: 0
 end
-define static.ru start
+define main.ru start
     phaseMod: 45
 end
-define static.u start
+define main.u start
     phaseMod: 90
 end
-define static.lu start
+define main.lu start
     phaseMod: 135
 end
-define static.l start
+define main.l start
     phaseMod: 180
 end
-define static.ld start
+define main.ld start
     phaseMod: 225
 end
-define static.d start
+define main.d start
     phaseMod: 270
 end
-define static.rd start
+define main.rd start
     phaseMod: 315
 end
 
-create static 64..80,2
+create main 64-80,2
 
-#define _dynamic.1 start
-#    dur: 8
-#    step: 1
-#    length: -1
-#
-#    _rad: 15, 9, x
-#    
-#    cx: 0
-#    cy: 1.5
-#    rx: _rad * (4 / 3)
-#    ry: _rad
-#    
-#    l: -2
-#    r: -l
-#    d: -1
-#    u: -d
-#    
-#    
-#    _phaseAdd: 45, 180, sineOut
-#    phase: _phase + _phaseAdd
-#    lrotz: phase + 90
-#end
-#
-#create static 80
-#
+define _dynamic.1 start
+    len: -1
+
+    rad: 15 - linear * 4
+    
+    phaseAdd: 45 + linear * (180 - 45)
+end
+
+create main 80-88,1
+
+define _dynamic.2 start
+    len: -0.5
+    
+    rad: 11 - inSine * 5
+    
+    l: -2 + linear * 0.5
+    d: -1 + linear * 0.2
+    
+    phaseAdd: 180 + linear * 225
+end
+
+create main 88-92,0.5
+
+define _dynamic.3 start
+    len: -2
+    
+    rad: 6 - outSine * 2
+    
+    l: -1.5 + linear * 0.5
+    d: -0.8 + linear * 0.6
+    phaseAdd: 45 + outSine * 315
+end
+
+create main 92-94, 1 / 2, 1 / 3, 1 / 6
+
+define _static.2 start
+    len: -1
+    
+    rad: 4
+    
+    l: -1
+    d: -0.2
+    
+    phaseAdd: 0
+end
+
+create main 94

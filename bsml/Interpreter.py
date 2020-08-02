@@ -157,16 +157,25 @@ class BSMLInterpreter:
         
         # Call the Track's .create with the parsed arguments, multiple times if we have multiple beats
         for beat in beats:
-            if ".." in beat:
-                # we want to be able to do a range() of beats, this is the denotation
-                start, end_inc = beat.split("..")
-                end, inc = [round(float(x), 4) for x in end_inc.split(",")]
-                b = round(float(start), 4)
+            if "-" in beat:
+                beat = " ".join(beats)
+                # We want to be able to do a range() of beats, this is the denotation
+                # start-end,inc,inc2,inc3
+                start, end_inc = beat.split("-")
+                end = round(eval(end_inc.split(",")[0]), 4)
+                # Multiple increment support - for stupid swing kick things, thanks Sandblast buildup
+                print("end_inc: %s" % end_inc)
+                incs = [round(eval(x), 4) for x in end_inc.split(",")[1:]]
+                b = round(eval(start), 4)
+                i = 0
                 while not (b >= end):
-                    self.tracks[self.lastTrack].create(self.lastPlan, b, float(start), end)
-                    b = round(b + inc, 4)
+                    self.tracks[self.lastTrack].create(self.lastPlan, b, eval(start), end)
+                    print("i: %s" % i)
+                    b = round(b + incs[i], 4)
+                    i = (0 if i + 1 >= len(incs) else i + 1)
+                break
             else:
-                beat = float(beat)
+                beat = eval(beat)
                 self.tracks[self.lastTrack].create(self.lastPlan, beat)
     
     def merge(self, name, block):

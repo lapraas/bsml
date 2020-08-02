@@ -1,88 +1,87 @@
-#
-#track circle bass
-#
-#define _base start
-#    dur: 4
-#    
-#    rx: 30
-#    ry: rx
-#    cx: 0
-#    cy: ry * 0.9
-#    
-#    l: -2
-#    r: -l
-#    d: -0.1
-#    u: -d
-#    
-#    # hidden value :)
-#    # exists so we don't have to retype phase expression every time, and is ignored by the create function
-#    _x: 0
-#    
-#    # phase reevaluates _x every consequent time it's not explicitly defined
-#    phase: 280 + 20 * _x
-#    lrotz: phase + 90
-#    
-#    mirror: 1
-#end
-#
-#define c.l start
-#    _x: 2 / 5
-#end
-#define c.m start
-#    _x: 3 / 5
-#end
-#define c.r start
-#    _x: 4 / 5
-#end
-#
-#define eb.l from c.m # 3
-#define eb.m from c.r # 4
-#define eb.r start
-#    _x: 5 / 5
-#end
-#
-#define ab2.l from c.r # 4
-#define ab2.m from eb.r # 5
-#define ab2.r start
-#    _x: 6 / 5
-#end
-#
-#define bb.l start
-#    _x: 1 / 5
-#end
-#define bb.m from c.l # 2
-#define bb.r from c.m # 3
-#
-#define f.l start
-#    _x: -1 / 5
-#end
-#define f.m start
-#    _x: 0 / 5
-#end
-#define f.r from bb.l # 1
-#
-#define ab1.l from f.m # 0
-#define ab1.m from bb.l # 1
-#define ab1.r from c.l # 2
-#
-#merge prog1 start
-#    0: c
-#    4: eb
-#    8: ab2
-#    12: bb
-#end
-#
-#merge prog2 start
-#    0: c
-#    4: f
-#    8: ab1
-#    12: bb
-#end
-#
-#merge prog start
-#    0: prog1
-#    16: prog2
-#end
-#
-#create prog 32
-#create prog1 64
+
+track circle bass
+
+define _base start
+    len: 4
+    
+    rx: 30
+    ry: rx
+    cx: 0
+    cy: ry * 0.9
+    
+    l: -2
+    r: -l
+    d: -0.1
+    u: -d
+    
+    note: 0
+    totalNotes: 5
+    
+    # phase reevaluates note every consequent time it's not explicitly defined
+    phase: 280 + 20 * (note / totalNotes)
+    lrotz: phase + 90
+    
+    mirror: 1
+end
+
+define c.l start
+    note: 2
+end
+define c.m start
+    note: 3
+end
+define c.r start
+    note: 4
+end
+
+define eb.l from c.m # 3
+define eb.m from c.r # 4
+define eb.r start
+    note: 5
+end
+
+define ab2.l from c.r # 4
+define ab2.m from eb.r # 5
+define ab2.r start
+    note: 6
+end
+
+define bb.l start
+    note: 1
+end
+define bb.m from c.l # 2
+define bb.r from c.m # 3
+
+define f.l start
+    note: -1
+end
+define f.m start
+    note: 0
+end
+define f.r from bb.l # 1
+
+define ab1.l from f.m # 0
+define ab1.m from bb.l # 1
+define ab1.r from c.l # 2
+
+merge prog1 start
+    0: c
+    4: eb
+    8: ab2
+    12: bb
+end
+
+merge prog2 start
+    0: c
+    4: f
+    8: ab1
+    12: bb
+end
+
+merge prog start
+    0: prog1
+    16: prog2
+end
+
+create prog 32
+create prog1 64

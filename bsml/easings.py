@@ -21,7 +21,7 @@ easings = {
     "semicircle": lambda x: math.sqrt(1 - pow(2*x - 1, 2)) 
 }
 
-def ez(easing, x=1):
+def ez(easing, x):
     #print("getting easing for %s" % x)
     if easing in easings:
         return easings[easing](x)
