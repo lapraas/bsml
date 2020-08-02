@@ -24,6 +24,8 @@ class Track:
         # Update the current set of parameters to feed to the blueprint with new parameters.
         fromPlan = {} if not fromPlanName in self.plans else self.plans[fromPlanName]
         
+        self.base = copy.deepcopy({**self.base, **fromPlan, **params})
+        
         # Create a full set of parameters mapped to the given name, and put it into a list to account for superplans.
         self.plans[name] = copy.deepcopy({**fromPlan, **params})
         print("Track: defined new plan %s: %s" % (name, self.plans[name]))
@@ -46,7 +48,7 @@ class Track:
         for subBeat in planListsWithOffsets:
             #print("subBeat: %s" % subBeat)
             for plan in planListsWithOffsets[subBeat]:
-                print("plan: %s" % plan)
+                #print("plan: %s" % plan)
                 cPlan = {"beat": beat + subBeat, "t": t}
                 tempStruc = Structure()
                 for argName in plan:
@@ -105,6 +107,7 @@ class Track:
                 ret[beat] = []
             ret[beat].append(copy.deepcopy(self.plans[targetName]))
         elif targetName in self.superplans:
-            ret = self.getPlans(targetName, beat, ret)
+            for subPlanBeat in self.superplans[targetName]:
+                ret = self.getPlans(self.superplans[targetName][subPlanBeat], beat + subPlanBeat, ret)
         #print("Track: getPlans returns: %s" % ret)
         return ret
