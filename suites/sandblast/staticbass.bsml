@@ -7,7 +7,7 @@ define _base start
     rx: 30
     ry: rx
     cx: 0
-    cy: ry * 0.9
+    cy: ry * 0.95
     
     l: -2
     r: -l

@@ -4,10 +4,10 @@ track circle xyl
 define _base start
     len: 0.5
     
-    rx: 4
+    rx: 5
     ry: 3
     cx: 0
-    cy: 0
+    cy: 0.5
     
     l: -0.3
     r: 0.3

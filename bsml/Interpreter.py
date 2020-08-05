@@ -164,13 +164,13 @@ class BSMLInterpreter:
                 start, end_inc = beat.split("-")
                 end = round(eval(end_inc.split(",")[0]), 4)
                 # Multiple increment support - for stupid swing kick things, thanks Sandblast buildup
-                print("end_inc: %s" % end_inc)
+                #print("end_inc: %s" % end_inc)
                 incs = [round(eval(x), 4) for x in end_inc.split(",")[1:]]
                 b = round(eval(start), 4)
                 i = 0
                 while not (b >= end):
                     self.tracks[self.lastTrack].create(self.lastPlan, b, eval(start), end)
-                    print("i: %s" % i)
+                    #print("i: %s" % i)
                     b = round(b + incs[i], 4)
                     i = (0 if i + 1 >= len(incs) else i + 1)
                 break
@@ -190,7 +190,7 @@ class BSMLInterpreter:
             line = line.strip()
             # The name of the plan will be followed by the beat offset at which it will be placed in relation to the create beat, like "piano:hit at 0"
             splitline = [v.strip() for v in line.split(":")]
-            print("  splitline: %s" % splitline)
+            #print("  splitline: %s" % splitline)
             beat = float(splitline[0])
             # Set the given plan to the given beat
             planOffsets[beat] = splitline[1]
