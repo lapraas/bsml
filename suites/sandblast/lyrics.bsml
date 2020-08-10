@@ -1,0 +1,15 @@
+
+track text lyrics
+
+define test start
+    dur: 0.2
+    
+    text: "Hello, world"
+    x: -1
+    y: 1
+    spacing: 0.1
+    sx: 1
+    sy: 1
+end
+
+create test 1

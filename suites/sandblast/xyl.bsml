@@ -2,7 +2,7 @@
 track circle xyl
 
 define _base start
-    len: 0.5
+    dur: 0.5
     
     rx: 5
     ry: 3
@@ -18,7 +18,7 @@ define _base start
     totalNotes: 14
     noteDegRange: 100
     
-    # centered above the player in an arc with a degree length of noteDegRange
+    # centered above the player in an arc with a degree durgth of noteDegRange
     phase: 180 - ((180 - noteDegRange) / 2) - noteDegRange * (note / totalNotes)
     lrotz: phase
 end
@@ -69,6 +69,7 @@ merge melodyP1 start
     2: c5
     3: g4
 end
+anim melodyP1 collectAndFade
    
 merge melodyP2a start
     0: f5
@@ -76,6 +77,7 @@ merge melodyP2a start
     2: bb4
     3: g4
 end
+anim melodyP2a collectAndFade
 
 merge melodyP2b start
     0: eb5
@@ -83,6 +85,7 @@ merge melodyP2b start
     2: c5
     3: ab4
 end
+anim melodyP2b collectAndFade
 
 merge melodyP3 start
     0: eb5
@@ -90,6 +93,7 @@ merge melodyP3 start
     2: c5
     3: bb4
 end
+anim melodyP3 collectAndFade
 
 merge melodyP4 start
     0: d5
@@ -97,6 +101,7 @@ merge melodyP4 start
     2: bb4
     3: c5
 end
+anim melodyP4 collectAndFade
 
 merge melody start
     0: melodyP1

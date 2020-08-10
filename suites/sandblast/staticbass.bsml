@@ -2,7 +2,7 @@
 track circle bass
 
 define _base start
-    len: 4
+    dur: 4
     
     rx: 30
     ry: rx

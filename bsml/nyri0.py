@@ -1,7 +1,7 @@
 import imageio
 
 def load_font():
-    alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,'."
+    alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,'"
     font_img = imageio.imread("assets/fonts/jones.png")
     img_dim = font_img.shape[:2]
 
@@ -75,3 +75,12 @@ def load_font():
     font[" "] = (5, [])
 
     return font
+
+def getTextWidth(text, font):
+    totalTextWidth = 0
+    for char in text:
+        if not char in font:
+            raise Exception("Character '%s' is not a part of the supported alphabet" % char)
+        charWidth = font[char][0]
+        totalTextWidth += charWidth
+    return totalTextWidth

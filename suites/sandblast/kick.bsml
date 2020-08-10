@@ -2,7 +2,7 @@
 track circle buildup
 
 define _static start
-    len: 1
+    dur: 1
 
     rad: 12
     
@@ -50,7 +50,7 @@ end
 create main 64-80,2
 
 define _dynamic.1 start
-    len: -1
+    dur: -1
 
     rad: 12 - linear * 2
     
@@ -60,7 +60,7 @@ end
 create main 80-88,1
 
 define _dynamic.2 start
-    len: -0.5
+    dur: -0.5
     
     rad: 10 - inSine * 2
     
@@ -73,7 +73,7 @@ end
 create main 88-92,0.5
 
 define _dynamic.3 start
-    len: -2
+    dur: -2
     
     rad: 8 - linear * 2
     
@@ -85,7 +85,7 @@ end
 create main 92-94, 2 / 6, 1 / 6
 
 define _static.2 start
-    len: -1
+    dur: -1
     
     rad: 6
     

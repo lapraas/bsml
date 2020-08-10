@@ -2,7 +2,7 @@
 import math
 
 class Wall:
-    def __init__(self, beat, dur, l, r, d, u, rot=0, lrotx=0, lroty=0, lrotz=0):
+    def __init__(self, beat, dur, l, r, d, u, rot=[0, 0, 0], lrot=[0, 0, 0], animation=None):
         self.beat = beat
         self.dur = dur
         self.l = l
@@ -10,9 +10,8 @@ class Wall:
         self.d = d
         self.u = u
         self.rot = rot
-        self.lrotx = lrotx
-        self.lroty = lroty
-        self.lrotz = lrotz
+        self.lrot = lrot
+        self.animation = None
         #print("new wall created (%s, %s, %s, %s)" % (self.l, self.r, self.d, self.u))
         if self.r < self.l:
             raise Exception("Wall with bad dimensions (r: %s, l: %s" % (self.r, self.l))
@@ -30,11 +29,16 @@ class Wall:
     
     def mirror(self):
         """ Returns a new Wall mirrored over the middle of the lanes."""
-        return Wall(self.beat, self.dur, -self.r, -self.l, self.d, self.u, -self.rot, self.lrotx, -self.lroty, -self.lrotz)
+        newRot = [x for x in self.rot]
+        newRot[1] = -newRot[1]
+        newLRot = [x for x in self.lrot]
+        newLRot[1] = -newLRot[1]
+        newLRot[2] = -newLRot[2]
+        return Wall(self.beat, self.dur, -self.r, -self.l, self.d, self.u, newRot, newLRot)
     
     def clone(self, beat):
         """ Returns an identical Wall at the given beat. """
-        return Wall(beat, self.dur, self.l, self.r, self.d, self.u)
+        return Wall(beat, self.dur, self.l, self.r, self.d, self.u, self.rot, self.lrot, self.animation)
     
     def json(self):
         """ Get the wall as a json object. """
@@ -45,14 +49,13 @@ class Wall:
             "_time": beat,
             "_duration": self.dur,
             #"_lineIndex": 0,
-            #"_type": h,
-            #"_width": w,
+            #"_type": 0,
+            #"_width": 0,
             "_customData": {
                 # to undo the local rotation z transform we have to take trig parts of it and multiply them by the dimensions of the wall, then add them to the position
-                "_position": [self.l + math.cos(math.radians(self.lrotz - 90)) * h / 2, self.d + math.sin(math.radians(self.lrotz-90)) * h / 2 + h / 2],
-                #"_position": [self.l, self.d],
+                "_position": [self.l + math.cos(math.radians(self.lrot[2] - 90)) * h / 2, self.d + math.sin(math.radians(self.lrot[2]-90)) * h / 2 + h / 2],
                 "_scale": [w, h],
                 "_rotation": self.rot,
-                "_localRotation": [self.lrotx, self.lroty, self.lrotz]
+                "_localRotation": self.lrot
             }
         }

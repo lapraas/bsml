@@ -1,8 +1,9 @@
 
 # Import all files in the blueprint folder, each of which contain a .create function.
 from blueprints import *
+from animations import *
 # Sift out the blueprint names from the random stuff in globals() to create a list with all of them.
-bpnames = [x for x in dir() if not x.startswith("__")]
+namecollection = [x for x in dir() if not x.startswith("__")]
 
 #from Track import Track
 from bsml.Track import Track
@@ -104,10 +105,11 @@ class BSMLInterpreter:
                     print("BSML: ".join(args))
                 elif op == "use":
                     self.use(name=args[0])
+                elif op == "anim":
+                    self.anim(superplanName=args[0], animName=args[1])
             except Exception as e:
                 print("Exception occurred while running BSML. Line %s: \n%s\n" % (ptr+1, line))
                 raise e
-    
     
     def splitNames(self, name):
         """ Split apart a name in the format `track`:`plan` and return the track name, then the plan name, both .strip()'d. """
@@ -118,10 +120,10 @@ class BSMLInterpreter:
     def newTrack(self, blueprint, name):
         """ Callback for the "track" keyword.
             Create a new track with a given blueprint function and name. """
-        if not blueprint in bpnames:
+        if not blueprint in namecollection:
             raise BSMLException("Blueprint of name %s not found" % (blueprint,))
         # The blueprint function that will do the creating of the walls.
-        blueprintFn = globals()[blueprint] # yes, it's disgusting; yes, it works
+        blueprintFn = globals()[blueprint].create # yes, it's disgusting; yes, it works
         self.tracks[name] = Track(blueprintFn)
         self.lastTrack = name
     
@@ -183,20 +185,26 @@ class BSMLInterpreter:
             Merge a series of plans together under one name to make a super-plan. """
         self.lastTrack, self.lastPlan = self.splitNames(name)
         #print("merge start for %s's %s" % (self.lastTrack, self.lastPlan))
-        planOffsets = {}
+        planListsWithOffsets = {}
         #print("Interpreter merge:")
         # Parse the lines containing the plans we want to merge.
         for line in block:
             line = line.strip()
-            # The name of the plan will be followed by the beat offset at which it will be placed in relation to the create beat, like "piano:hit at 0"
             splitline = [v.strip() for v in line.split(":")]
             #print("  splitline: %s" % splitline)
             beat = float(splitline[0])
             # Set the given plan to the given beat
-            planOffsets[beat] = splitline[1]
+            planListsWithOffsets[beat] = splitline[1]
         
         # Call the Track's .merge with the prepared arguments
-        self.tracks[self.lastTrack].merge(self.lastPlan, planOffsets)
+        self.tracks[self.lastTrack].merge(self.lastPlan, planListsWithOffsets)
+    
+    def anim(self, superplanName, animName):
+        self.lastTrack, self.lastPlan = self.splitNames(superplanName)
+        if not animName in namecollection:
+            raise BSMLException("Animation of name %s not found" % animName)
+        animFn = globals()[animName].create
+        self.tracks[self.lastTrack].assignAnim(superplanName, animFn)
     
     def use(self, name):
         self.lastTrack, self.lastPlan = self.splitNames(name)
