@@ -164,14 +164,17 @@ class BSMLInterpreter:
                 # We want to be able to do a range() of beats, this is the denotation
                 # start-end,inc,inc2,inc3
                 start, end_inc = beat.split("-")
+                start = round(eval(start), 4)
                 end = round(eval(end_inc.split(",")[0]), 4)
                 # Multiple increment support - for stupid swing kick things, thanks Sandblast buildup
                 #print("end_inc: %s" % end_inc)
                 incs = [round(eval(x), 4) for x in end_inc.split(",")[1:]]
-                b = round(eval(start), 4)
+                b = start
                 i = 0
                 while not (b >= end):
-                    self.tracks[self.lastTrack].create(self.lastPlan, b, eval(start), end)
+                    dist = b - start
+                    t = dist / (end - start) # The percent of progress through the range.
+                    self.tracks[self.lastTrack].create(self.lastPlan, b, t)
                     #print("i: %s" % i)
                     b = round(b + incs[i], 4)
                     i = (0 if i + 1 >= len(incs) else i + 1)

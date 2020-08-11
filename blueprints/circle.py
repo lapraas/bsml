@@ -7,4 +7,4 @@ def create(beat, dur, rx, ry, phase, l, r, d, u, cx=0, cy=0, rotx=0, roty=0, rot
     y = (ry) * sin(radians(phase)) + (cy)
     
     wall = Wall(beat, dur, x + l, x + r, y + d, y + u, [rotx, roty, rotz], [lrotx, lroty, lrotz])
-    return wall
+    return [wall]

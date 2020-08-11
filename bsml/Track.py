@@ -43,66 +43,75 @@ class Track:
         """ Overwrite values on the current set of full params. """
         self.base = {**self.base, **self.plans[name]}
     
-    def create(self, name, beat, tStart=None, tEnd=None):
+    def createStructWithPlan(self, planName, beat, t):
+        """ Calls the blueprint function with an evaluated copy of the specified plan and returns a structure with the resulting walls. """
+        # The evaluated plan. Initially has the beat and the time along range so that they can be used in self.evaluate.
+        evalPlan = {"beat": beat, "t": t}
+        # The structure to hold all of the walls in the structures given by the blueprint function.
+        struct = Structure()
+        # The plan to use. Defaults any unspecified values to the base values, assigned with self.use or self.define.
+        plan = {**self.base, **self.plans[planName]}
+        
+        # Evaluate each item in the plan to use.
+        for argName in plan:
+            arg = plan[argName]
+            evalPlan[argName] = self.evaluate(arg, evalPlan, t)
+        
+        # Call the blueprint function with the evaluated plan, then add each wall in the list returned to the structure.
+        creation = self.blueprintFn(**evalPlan)
+        for wall in creation:
+            struct.addWall(wall)
+        
+        # Check to see if we need to mirror the plan.
+        if "mirror" in evalPlan and evalPlan["mirror"]:
+            struct.mirror()
+        
+        return struct
+    
+    def create(self, name, beat, t=0):
         """ At a given beat, create a new Structure based on the a given plan (or superplan). """
         # Get all the plans associated with the given name.
-        planListsWithOffsets = self.getPlans(name)
-        #print("self.plans after self.getPlans: %s" % self.plans)
-
-        # When called with a range, these values are used to handle how far across the range the current function call is.
-        dist = 0 if not tStart else beat - tStart
-        t = 0 if not tStart else dist / (tEnd - tStart) # The percent of progress through the range.
-        #print("planListsWithOffsets: %s" % planListsWithOffsets)
+        planNamesWithOffsets = self.getPlanNameListsWithOffsets(name)
         
         walls = Structure()
         
-        # Iterate through all of the beat offsets
-        for beatOffset in planListsWithOffsets:
+        # Iterate through all of the beat offsets and create each plan there.
+        for beatOffset in planNamesWithOffsets:
             #print("subBeat: %s" % subBeat)
-            planList = planListsWithOffsets[beatOffset] # Multiple plans can be created on the same beat offset
-            for plan in planList:
-                #print("plan: %s" % plan)
-                cPlan = {"beat": beat + beatOffset, "t": t}
-                tempStruc = Structure()
-                for argName in plan:
-                    arg = plan[argName]
-                    cPlan[argName] = self.evaluate(arg, cPlan, t)
-                evaldBase = {}
-                for argName in self.base:
-                    arg = self.base[argName]
-                    evaldBase[argName] = self.evaluate(arg, cPlan, t)
-                
-                compound = {**evaldBase, **cPlan}
-                creation = self.blueprintFn(**compound)
-                if type(creation) == list:
-                    for wall in creation:
-                        tempStruc.addWall(wall)
-                else:
-                    tempStruc.addWall(creation)
-                if "mirror" in compound and compound["mirror"]:
-                    tempStruc.mirror()
-                walls.addStructure(tempStruc)
+            planNameList = planNamesWithOffsets[beatOffset] # Multiple plans can be created on the same beat offset
+            for planName in planNameList:
+                struct = self.createStructWithPlan(planName, beat + beatOffset, t)
+                walls.addStructure(struct)
         
         self.structures.append(walls)
     
-    def evaluate(self, argStr, cPlan, progress):
+    def evaluate(self, argStr, evalPlan, progress):
+        """ Evaluates a given arg, replacing each variable with its value, or simply returning it if it's supposed to be a string. """
         #print("evaluating %s" % argStr)
+        
+        # If the whole thing is surrounded by quotes, return what's inside the two quotes.
+        # TODO This is bad - There may come a time when we want a list of strings, and this will need to work recursively (with regex).
         if argStr[0] in "\"'" and argStr[-1] in "\"'":
             return argStr[1:-1]
+        # Match groups of letter and underscore characters to be replaced by their corresponding values.
         wordPattern = re.compile(r"[a-zA-Z_]+")
         for word in re.findall(wordPattern, argStr):
             #print(word)
+            # Check to see if the matched word is an easing, then call its function if it is.
             if word in easings:
                 argStr = argStr.replace(word, str(ez(word, progress)))
+            # Check to see whether or not the word has been evaluated.
+            elif word in evalPlan:
+                argStr = argStr.replace(word, str(evalPlan[word]), 1)
+            # If the word isn't an easing and the word hasn't been evaluated, grab whatever matches from the base parameters.
+            elif word in self.base:
+                argStr = argStr.replace(word, self.base[word], 1)
+                # Since the base parameters are unevaluated, we need to recurse.
+                return self.evaluate(argStr, evalPlan, progress)
             else:
-                try:
-                    argStr = argStr.replace(word, str(cPlan[word]) if word in cPlan else self.base[word], 1)
-                except KeyError:
-                    raise Exception("Unknown keyword \"%s\", surround entire arg in quotes to skip keyword evaluation" % word)
-        try:
-            return eval(argStr)
-        except NameError:
-            return self.evaluate(argStr, cPlan, progress)
+                raise Exception("Unknown keyword \"%s\", surround entire arg in quotes to skip keyword evaluation" % word)
+        
+        return eval(argStr)
     
     def merge(self, name, superplan):
         """ Take multiple plans and combine them into a superplan (a series of plan names assigned to beats). """
@@ -113,12 +122,11 @@ class Track:
         
         self.superplans[name] = superplan
     
-    def assignAnim(self, superplanName, animCreateFn):
-        self.animations[superplanName] = animCreateFn
+    def assignAnim(self, planName, animCreateFn):
+        self.animations[planName] = animCreateFn
     
-    def getPlans(self, targetName, beat=0, ret=None):
-        """ Return a dict of lists of plans mapped to beat offsets. """
-        #print("getting plans under target name %s" % targetName)
+    def getPlanNameListsWithOffsets(self, targetName, beat=0, ret=None):
+        """ Return a dict of plan names (not superplan names) mapped to beat offsets. """
         if ret == None:
             # ok fuck python
             # https://docs.python-guide.org/writing/gotchas/#mutable-default-arguments
@@ -133,18 +141,18 @@ class Track:
             if splitName[0] == targetName:
                 #print("getting subplan of %s: %s" % (targetName, planName))
                 # Recursively call so that we can nest dot suffixes.
-                ret = self.getPlans(planName, beat, ret)
+                ret = self.getPlanNameListsWithOffsets(planName, beat, ret)
         # Now we do the simplest check to see if the targetName is a single plan.
         if targetName in self.plans:
             if not beat in ret:
                 #print("making new list for beat %s" % beat)
                 ret[beat] = []
-            ret[beat].append(copy.deepcopy(self.plans[targetName]))
+            ret[beat].append(targetName)
         # If it's not a single plan, we check to see if it's a superplan.
         elif targetName in self.superplans:
             # A superplan is a collection of plan names mapped to beat offsets, so we have to iterate through each
             for beatOffset in self.superplans[targetName]:
                 # Recursively call to account for nested superplans.
-                ret = self.getPlans(self.superplans[targetName][beatOffset], beat + beatOffset, ret)
-        #print("Track: getPlans returns: %s" % ret)
+                ret = self.getPlanNameListsWithOffsets(self.superplans[targetName][beatOffset], beat + beatOffset, ret)
+        
         return ret
